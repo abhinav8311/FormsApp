@@ -8,22 +8,92 @@ import {
   CardContent,
   CardActionArea,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 
 function Home() {
-  const navigate = useNavigate();
+  const handleCreateGoogleForm = async () => {
+    const token = localStorage.getItem('googleAccessToken');
+    if (!token) {
+      alert('Please sign in with Google to create a form');
+      return;
+    }
 
-  // Dummy data for now
-  const savedForms = [
-    { id: '1', title: '1' },
-    { id: '2', title: '2' },
-    { id: '3', title: '3' },
-  ];
+    try {
+      // Step 1: Create the form
+      const createRes = await fetch('https://forms.googleapis.com/v1/forms', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          info: {
+            title: 'Untitled Form',
+            documentTitle: 'Untitled Form',
+          },
+        }),
+      });
+
+      if (!createRes.ok) {
+        const errorText = await createRes.text();
+        console.error('❌ Form creation failed:', errorText);
+        alert('API Error: ' + errorText);
+        return;
+      }
+
+      const createdForm = await createRes.json();
+      console.log('✅ Created Form:', createdForm);
+
+      const formId = createdForm.formId;
+      if (!formId) {
+        alert('Form creation failed. No form ID received.');
+        return;
+      }
+
+      // Step 2: Add a default question (required for responder link to work)
+      const batchUpdateRes = await fetch(`https://forms.googleapis.com/v1/forms/${formId}:batchUpdate`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          requests: [
+            {
+              createItem: {
+                item: {
+                  title: 'What is your name?',
+                  questionItem: {
+                    question: {
+                      required: true,
+                      textQuestion: {},
+                    },
+                  },
+                },
+                location: {
+                  index: 0,
+                },
+              },
+            },
+          ],
+        }),
+      });
+
+      const updateData = await batchUpdateRes.json();
+      console.log('✏️ Question added:', updateData);
+
+      // Step 3: Manually open the responder link
+      const formUrl = `https://docs.google.com/forms/d/${formId}/viewform`;
+      window.open(formUrl, '_blank');
+    } catch (error) {
+      console.error('❌ Unexpected error:', error);
+      alert('Something went wrong while creating the form.');
+    }
+  };
 
   return (
     <Box p={4}>
       {/* Start New Form */}
-      <Typography variant="h6" gutterBottom align='center'>
+      <Typography variant="h6" gutterBottom align="center">
         Start a new form
       </Typography>
 
@@ -32,7 +102,7 @@ function Home() {
           <Card sx={{ height: 150 }}>
             <CardActionArea
               sx={{ height: '100%' }}
-              onClick={() => navigate('/form/new')}
+              onClick={handleCreateGoogleForm}
             >
               <CardContent
                 sx={{
@@ -53,34 +123,13 @@ function Home() {
         </Grid>
       </Grid>
 
-      {/* Divider */}
+      {/* (Optional) Saved Forms Section */}
       <Box mt={5}>
         <Typography variant="h6" gutterBottom>
           Your Forms
         </Typography>
-
         <Grid container spacing={2}>
-          {savedForms.map((form) => (
-            <Grid item xs={12} sm={6} md={3} key={form.id}>
-              <Card sx={{ height: 100 }}>
-                <CardActionArea
-                  sx={{ height: '100%' }}
-                  onClick={() => navigate(`/form/${form.id}`)}
-                >
-                  <CardContent
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      height: '100%',
-                    }}
-                  >
-                    <Typography variant="body1">{form.title}</Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            </Grid>
-          ))}
+          {/* You can dynamically show saved form cards here later */}
         </Grid>
       </Box>
     </Box>

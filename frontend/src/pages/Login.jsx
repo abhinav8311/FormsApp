@@ -11,20 +11,19 @@ import {
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
-import GoogleSignInButton from '../components/GoogleSignIn';
-
+import GoogleSignInButton from '../components/GoogleSignIn'; // ✅ renamed from GoogleSignInButton to match the correct file
 
 function Login() {
     const navigate = useNavigate();
     const [loginError, setLoginError] = useState('');
 
-    // ✅ Yup validation
+    // ✅ Validation schema using Yup
     const validationSchema = Yup.object({
         email: Yup.string().email('Invalid email').required('Email is required'),
         password: Yup.string().required('Password is required'),
     });
 
-    // ✅ On form submit
+    // ✅ Formik form submit handler
     const handleSubmit = (values) => {
         const users = JSON.parse(localStorage.getItem('users')) || [];
         const found = users.find(
@@ -33,7 +32,6 @@ function Login() {
         );
 
         if (found) {
-            // Optional: save login status to localStorage
             localStorage.setItem('isLoggedIn', true);
             localStorage.setItem('currentUser', JSON.stringify(found));
             navigate('/main');
@@ -49,19 +47,20 @@ function Login() {
                     Login
                 </Typography>
 
+                {/* 🔴 Show login error if incorrect credentials */}
                 {loginError && (
                     <Alert severity="error" sx={{ mb: 2 }}>
                         {loginError}
                     </Alert>
                 )}
 
+                {/* ✅ Email/password login form */}
                 <Formik
                     initialValues={{ email: '', password: '' }}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
                 >
                     {({ values, errors, touched, handleChange, handleBlur }) => (
-                        <>
                         <Form>
                             <TextField
                                 fullWidth
@@ -92,27 +91,32 @@ function Login() {
                                 <Button type="submit" variant="contained" fullWidth>
                                     Login
                                 </Button>
-                                <Box mt={2} textAlign="center">
-                                    <Typography variant="body2">
-                                        Not registered?{' '}
-                                        <Typography
-                                            component="span"
-                                            variant="body2"
-                                            color="primary"
-                                            sx={{ cursor: 'pointer', textDecoration: 'underline' }}
-                                            onClick={() => navigate('/register')}
-                                        >
-                                            Sign Up
-                                        </Typography>
-                                    </Typography>
-                                </Box>
+                            </Box>
 
+                            <Box mt={2} textAlign="center">
+                                <Typography variant="body2">
+                                    Not registered?{' '}
+                                    <Typography
+                                        component="span"
+                                        variant="body2"
+                                        color="primary"
+                                        sx={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                        onClick={() => navigate('/register')}
+                                    >
+                                        Sign Up
+                                    </Typography>
+                                </Typography>
+                            </Box>
+
+                            {/* ✅ OR Google OAuth Login */}
+                            <Box mt={4}>
+                                <Typography align="center" mb={1}>
+                                    — or —
+                                </Typography>
+                                <GoogleSignInButton />
                             </Box>
                         </Form>
-                        <GoogleSignInButton />
-                        </>
                     )}
-                    
                 </Formik>
             </Paper>
         </Container>
@@ -120,3 +124,4 @@ function Login() {
 }
 
 export default Login;
+// This code is a React component for a login page that includes both email/password login and Google OAuth login.
