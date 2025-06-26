@@ -8,87 +8,10 @@ import {
   CardContent,
   CardActionArea,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
-  const handleCreateGoogleForm = async () => {
-    const token = localStorage.getItem('googleAccessToken');
-    if (!token) {
-      alert('Please sign in with Google to create a form');
-      return;
-    }
-
-    try {
-      // Step 1: Create the form
-      const createRes = await fetch('https://forms.googleapis.com/v1/forms', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          info: {
-            title: 'Untitled Form',
-            documentTitle: 'Untitled Form',
-          },
-        }),
-      });
-
-      if (!createRes.ok) {
-        const errorText = await createRes.text();
-        console.error('❌ Form creation failed:', errorText);
-        alert('API Error: ' + errorText);
-        return;
-      }
-
-      const createdForm = await createRes.json();
-      console.log('✅ Created Form:', createdForm);
-
-      const formId = createdForm.formId;
-      if (!formId) {
-        alert('Form creation failed. No form ID received.');
-        return;
-      }
-
-      // Step 2: Add a default question (required for responder link to work)
-      const batchUpdateRes = await fetch(`https://forms.googleapis.com/v1/forms/${formId}:batchUpdate`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          requests: [
-            {
-              createItem: {
-                item: {
-                  title: 'What is your name?',
-                  questionItem: {
-                    question: {
-                      required: true,
-                      textQuestion: {},
-                    },
-                  },
-                },
-                location: {
-                  index: 0,
-                },
-              },
-            },
-          ],
-        }),
-      });
-
-      const updateData = await batchUpdateRes.json();
-      console.log('✏️ Question added:', updateData);
-
-      // Step 3: Manually open the responder link
-      const formUrl = `https://docs.google.com/forms/d/${formId}/viewform`;
-      window.open(formUrl, '_blank');
-    } catch (error) {
-      console.error('❌ Unexpected error:', error);
-      alert('Something went wrong while creating the form.');
-    }
-  };
+  const navigate = useNavigate();
 
   return (
     <Box p={4}>
@@ -102,7 +25,7 @@ function Home() {
           <Card sx={{ height: 150 }}>
             <CardActionArea
               sx={{ height: '100%' }}
-              onClick={handleCreateGoogleForm}
+              onClick={() => navigate('/formbuilder')} // ✅ new route
             >
               <CardContent
                 sx={{
