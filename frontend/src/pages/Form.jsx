@@ -18,6 +18,8 @@ function FormBuilder() {
     { type: 'text', label: '', options: [''] },
   ]);
 
+  const [showPreview, setShowPreview] = useState(false);
+
   const handleAddQuestion = () => {
     setQuestions([
       ...questions,
@@ -287,7 +289,66 @@ function FormBuilder() {
         >
           Publish to Google Forms
         </Button>
+
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => setShowPreview(!showPreview)}
+        >
+          {showPreview ? 'Hide Preview' : 'Preview Form'}
+        </Button>
       </Box>
+      {showPreview && (
+  <Box mt={5}>
+    <Typography variant="h6" gutterBottom>
+      🔎 Form Preview
+    </Typography>
+    <Paper elevation={3} sx={{ p: 3 }}>
+      <Typography variant="h5" gutterBottom>
+        {title || 'Untitled Form'}
+      </Typography>
+
+      {questions.map((q, index) => (
+        <Box key={index} mb={3}>
+          <Typography variant="subtitle1">
+            {index + 1}. {q.label || '(No Question Text)'}
+          </Typography>
+
+          {q.type === 'text' && (
+            <TextField fullWidth placeholder="Short answer" disabled />
+          )}
+
+          {['mcq', 'checkbox', 'dropdown'].includes(q.type) && (
+            <Box mt={1}>
+              {q.type === 'dropdown' ? (
+                <TextField select fullWidth disabled>
+                  {q.options.map((opt, i) => (
+                    <MenuItem key={i} value={opt}>{opt}</MenuItem>
+                  ))}
+                </TextField>
+              ) : (
+                q.options.map((opt, i) => (
+                  <Box key={i}>
+                    <label>
+                      <input
+                        type={q.type === 'mcq' ? 'radio' : 'checkbox'}
+                        disabled
+                        name={`q${index}`}
+                      />
+                      {` ${opt}`}
+                    </label>
+                  </Box>
+                ))
+              )}
+            </Box>
+          )}
+        </Box>
+      ))}
+    </Paper>
+  </Box>
+)}
+
+
     </Box>
   );
 }
