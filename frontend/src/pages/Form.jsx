@@ -88,6 +88,13 @@ function FormBuilder() {
         }),
       });
 
+      const saveFormToLocal = (formId, title) => {
+  const storedForms = JSON.parse(localStorage.getItem('createdForms')) || [];
+  storedForms.push({ id: formId, title });
+  localStorage.setItem('createdForms', JSON.stringify(storedForms));
+};
+
+
       if (!createRes.ok) {
         const error = await createRes.text();
         console.error('❌ Form creation failed:', error);
@@ -97,6 +104,8 @@ function FormBuilder() {
 
       const createdForm = await createRes.json();
       const formId = createdForm.formId;
+      saveFormToLocal(formId, title || 'Untitled Form');
+
 
       // Step 2: Generate valid batchUpdate requests
       const requests = questions

@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 import Form from './pages/Form';
 import Layout from './components/Layout';
+import FormResponses from './pages/FormResponses';
 
 function App() {
 
@@ -27,6 +28,14 @@ function App() {
         element={
           <ProtectedRoute>
             <Layout><Home /></Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/responses/:formId"
+        element={
+          <ProtectedRoute>
+            <Layout><FormResponses /></Layout>
           </ProtectedRoute>
         }
       />
