@@ -8,6 +8,8 @@ import {
   Paper,
   MenuItem,
   Grid,
+  Switch,
+  FormControlLabel
 } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -15,7 +17,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 function FormBuilder() {
   const [title, setTitle] = useState('Untitled Form');
   const [questions, setQuestions] = useState([
-    { type: 'text', label: '', options: [''] },
+    { type: 'text', label: '', options: [''] , required: false},
   ]);
 
   const [showPreview, setShowPreview] = useState(false);
@@ -23,7 +25,7 @@ function FormBuilder() {
   const handleAddQuestion = () => {
     setQuestions([
       ...questions,
-      { type: 'text', label: '', options: [''] },
+      { type: 'text', label: '', options: [''], required: false },
     ]);
   };
 
@@ -72,8 +74,26 @@ function FormBuilder() {
       return;
     }
 
+    const hasEmptyRequired = questions.some((q, i) => {
+  if (!q.required) return false;
+
+  const labelEmpty = !q.label || q.label.trim() === '';
+  const hasChoices = ['mcq', 'checkbox', 'dropdown'].includes(q.type)
+    ? (q.options || []).filter(opt => opt.trim()).length === 0
+    : false;
+
+  return labelEmpty || hasChoices;
+});
+
+if (hasEmptyRequired) {
+  alert('Some required questions are incomplete. Please fill all required labels and options.');
+  return;
+}
+
+
     try {
       // Step 1: Create form
+
       const createRes = await fetch('https://forms.googleapis.com/v1/forms', {
         method: 'POST',
         headers: {
@@ -121,7 +141,7 @@ function FormBuilder() {
                 title: q.label.trim(),
                 questionItem: {
                   question: {
-                    required: true,
+                    required: q.required || false,
                   },
                 },
               },
@@ -234,6 +254,23 @@ function FormBuilder() {
                 <MenuItem value="dropdown">Dropdown</MenuItem>
               </TextField>
             </Grid>
+
+            <Grid item xs={12}>
+  <FormControlLabel
+    control={
+      <Switch
+        checked={q.required}
+        onChange={(e) => {
+          const updated = [...questions];
+          updated[qIndex].required = e.target.checked;
+          setQuestions(updated);
+        }}
+      />
+    }
+    label="Required"
+  />
+</Grid>
+
 
             {['mcq', 'checkbox', 'dropdown'].includes(q.type) &&
               q.options.map((opt, oIndex) => (
