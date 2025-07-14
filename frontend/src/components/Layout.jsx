@@ -9,11 +9,12 @@ import {
   Paper,
 } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Layout = ({ children }) => {
   const { currentUser } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const hideUserInfo =
     location.pathname === '/login' || location.pathname === '/register';
@@ -35,7 +36,13 @@ const Layout = ({ children }) => {
             height: 64,
           }}
         >
-          <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#fff' }}>
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 'bold', color: '#fff', cursor: hideUserInfo ? 'default' : 'pointer', userSelect: 'none' }}
+            onClick={() => {
+              if (!hideUserInfo) navigate('/home');
+            }}
+          >
             Forms Manager
           </Typography>
 

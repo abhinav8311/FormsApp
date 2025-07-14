@@ -16,6 +16,9 @@ import {
 import { useNavigate } from 'react-router-dom';
 import SortIcon from '@mui/icons-material/Sort';
 import DeleteIcon from '@mui/icons-material/Delete';
+// Firestore imports
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 // Debounce utility: delays function execution until user stops typing
 function useDebounce(value, delay) {
@@ -46,10 +49,17 @@ const Home = () => {
   // Debounced search value
   const debouncedSearch = useDebounce(search, 300);
 
-  // Load created forms from localStorage on page load
+  // Fetch forms from Firestore on mount
   useEffect(() => {
-    const forms = JSON.parse(localStorage.getItem('createdForms')) || [];
-    setCreatedForms(forms);
+    const fetchForms = async () => {
+      const querySnapshot = await getDocs(collection(db, 'forms'));
+      const forms = [];
+      querySnapshot.forEach((docSnap) => {
+        forms.push({ ...docSnap.data(), docId: docSnap.id });
+      });
+      setCreatedForms(forms);
+    };
+    fetchForms();
   }, []);
 
   // Fetch responses for all forms (for sorting by response count)
@@ -116,11 +126,10 @@ const Home = () => {
     setAnchorEl(null);
   };
 
-  // Delete a form by id
-  const handleDeleteForm = (formId) => {
-    const updatedForms = createdForms.filter((form) => form.id !== formId);
-    setCreatedForms(updatedForms);
-    localStorage.setItem('createdForms', JSON.stringify(updatedForms));
+  // Delete a form from Firestore
+  const handleDeleteForm = async (docId) => {
+    await deleteDoc(doc(db, 'forms', docId));
+    setCreatedForms((prev) => prev.filter((form) => form.docId !== docId));
   };
 
   return (
@@ -201,7 +210,7 @@ const Home = () => {
           <Typography>No forms found.</Typography>
         ) : (
           filteredForms.map((form) => (
-            <Grid item key={form.id} xs={12} sm={6} md={4}>
+            <Grid item key={form.docId} xs={12} sm={6} md={4}>
               <Card sx={{ p: 2 }}>
                 <CardContent>
                   <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -209,7 +218,7 @@ const Home = () => {
                       {form.title}
                     </Typography>
                     {/* Delete Button */}
-                    <IconButton color="error" onClick={() => handleDeleteForm(form.id)} size="small">
+                    <IconButton color="error" onClick={() => handleDeleteForm(form.docId)} size="small">
                       <DeleteIcon />
                     </IconButton>
                   </Box>

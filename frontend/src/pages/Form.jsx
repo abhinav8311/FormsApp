@@ -13,6 +13,8 @@ import {
 } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { addDoc, collection } from 'firebase/firestore';
+import { db } from '../firebase';
 
 function FormBuilder() {
   const [title, setTitle] = useState('Untitled Form');
@@ -108,10 +110,18 @@ if (hasEmptyRequired) {
         }),
       });
 
-      const saveFormToLocal = (formId, title) => {
-        const storedForms = JSON.parse(localStorage.getItem('createdForms')) || [];
-        storedForms.push({ id: formId, title, createdAt: Date.now() }); // Add createdAt timestamp
-        localStorage.setItem('createdForms', JSON.stringify(storedForms));
+
+      // Save form to Firestore instead of localStorage
+      const saveFormToFirestore = async (formId, title) => {
+        try {
+          await addDoc(collection(db, 'forms'), {
+            id: formId,
+            title,
+            createdAt: Date.now(),
+          });
+        } catch (err) {
+          console.error('Error saving form to Firestore:', err);
+        }
       };
 
 
@@ -124,7 +134,7 @@ if (hasEmptyRequired) {
 
       const createdForm = await createRes.json();
       const formId = createdForm.formId;
-      saveFormToLocal(formId, title || 'Untitled Form');
+      await saveFormToFirestore(formId, title || 'Untitled Form');
 
 
       // Step 2: Generate valid batchUpdate requests
@@ -383,6 +393,7 @@ if (hasEmptyRequired) {
                         </Box>
                       ))
                     )}
+                    
                   </Box>
                 )}
               </Box>
