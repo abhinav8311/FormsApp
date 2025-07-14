@@ -42,11 +42,11 @@ const Layout = ({ children }) => {
           {!hideUserInfo && currentUser && (
             <Stack direction="row" spacing={1} alignItems="center">
               <Typography variant="body2" sx={{ color: '#fff' }}>
-                {currentUser.displayName || currentUser.email}
+                {currentUser.name}
               </Typography>
               <Avatar
-                src={currentUser.photoURL}
-                alt={currentUser.displayName}
+                src={currentUser.picture}
+                alt={currentUser.name}
               />
             </Stack>
           )}

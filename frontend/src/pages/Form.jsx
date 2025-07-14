@@ -109,10 +109,10 @@ if (hasEmptyRequired) {
       });
 
       const saveFormToLocal = (formId, title) => {
-  const storedForms = JSON.parse(localStorage.getItem('createdForms')) || [];
-  storedForms.push({ id: formId, title });
-  localStorage.setItem('createdForms', JSON.stringify(storedForms));
-};
+        const storedForms = JSON.parse(localStorage.getItem('createdForms')) || [];
+        storedForms.push({ id: formId, title, createdAt: Date.now() }); // Add createdAt timestamp
+        localStorage.setItem('createdForms', JSON.stringify(storedForms));
+      };
 
 
       if (!createRes.ok) {
@@ -345,56 +345,51 @@ if (hasEmptyRequired) {
         </Button>
       </Box>
       {showPreview && (
-  <Box mt={5}>
-    <Typography variant="h6" gutterBottom>
-      🔎 Form Preview
-    </Typography>
-    <Paper elevation={3} sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>
-        {title || 'Untitled Form'}
-      </Typography>
-
-      {questions.map((q, index) => (
-        <Box key={index} mb={3}>
-          <Typography variant="subtitle1">
-            {index + 1}. {q.label || '(No Question Text)'}
+        <Box mt={5}>
+          <Typography variant="h6" gutterBottom>
+            🔎 Form Preview
           </Typography>
-
-          {q.type === 'text' && (
-            <TextField fullWidth placeholder="Short answer" disabled />
-          )}
-
-          {['mcq', 'checkbox', 'dropdown'].includes(q.type) && (
-            <Box mt={1}>
-              {q.type === 'dropdown' ? (
-                <TextField select fullWidth disabled>
-                  {q.options.map((opt, i) => (
-                    <MenuItem key={i} value={opt}>{opt}</MenuItem>
-                  ))}
-                </TextField>
-              ) : (
-                q.options.map((opt, i) => (
-                  <Box key={i}>
-                    <label>
-                      <input
-                        type={q.type === 'mcq' ? 'radio' : 'checkbox'}
-                        disabled
-                        name={`q${index}`}
-                      />
-                      {` ${opt}`}
-                    </label>
+          <Paper elevation={3} sx={{ p: 3 }}>
+            <Typography variant="h5" gutterBottom>
+              {title || 'Untitled Form'}
+            </Typography>
+            {questions.map((q, index) => (
+              <Box key={index} mb={3}>
+                <Typography variant="subtitle1">
+                  {index + 1}. {q.label || '(No Question Text)'}
+                </Typography>
+                {q.type === 'text' && (
+                  <TextField fullWidth placeholder="Short answer" disabled />
+                )}
+                {['mcq', 'checkbox', 'dropdown'].includes(q.type) && (
+                  <Box mt={1}>
+                    {q.type === 'dropdown' ? (
+                      <TextField select fullWidth disabled>
+                        {q.options.map((opt, i) => (
+                          <MenuItem key={i} value={opt}>{opt}</MenuItem>
+                        ))}
+                      </TextField>
+                    ) : (
+                      q.options.map((opt, i) => (
+                        <Box key={i}>
+                          <label>
+                            <input
+                              type={q.type === 'mcq' ? 'radio' : 'checkbox'}
+                              disabled
+                              name={`q${index}`}
+                            />
+                            {` ${opt}`}
+                          </label>
+                        </Box>
+                      ))
+                    )}
                   </Box>
-                ))
-              )}
-            </Box>
-          )}
+                )}
+              </Box>
+            ))}
+          </Paper>
         </Box>
-      ))}
-    </Paper>
-  </Box>
-)}
-
-
+      )}
     </Box>
   );
 }
