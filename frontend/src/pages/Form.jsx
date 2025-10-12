@@ -98,7 +98,8 @@ if (hasEmptyRequired) {
 
       const createRes = await fetch('https://forms.googleapis.com/v1/forms', {
         method: 'POST',
-        headers: {
+        headers:
+         {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
@@ -221,179 +222,176 @@ if (hasEmptyRequired) {
   };
 
   return (
-    <Box p={4}>
-      <Typography variant="h5" gutterBottom>
-        Form Builder
-      </Typography>
-
-      <TextField
-        fullWidth
-        label="Form Title"
-        variant="outlined"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        sx={{ mb: 3 }}
-      />
-
-      {questions.map((q, qIndex) => (
-        <Paper key={qIndex} sx={{ p: 2, mb: 3 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={10}>
-              <TextField
-                fullWidth
-                label={`Question ${qIndex + 1}`}
-                value={q.label}
-                onChange={(e) =>
-                  handleQuestionChange(qIndex, 'label', e.target.value)
-                }
-              />
-            </Grid>
-            <Grid item xs={2}>
-              <TextField
-                select
-                fullWidth
-                label="Type"
-                value={q.type}
-                onChange={(e) =>
-                  handleQuestionChange(qIndex, 'type', e.target.value)
-                }
-              >
-                <MenuItem value="text">Short Answer</MenuItem>
-                <MenuItem value="mcq">Multiple Choice</MenuItem>
-                <MenuItem value="checkbox">Checkboxes</MenuItem>
-                <MenuItem value="dropdown">Dropdown</MenuItem>
-              </TextField>
-            </Grid>
-
-            <Grid item xs={12}>
-  <FormControlLabel
-    control={
-      <Switch
-        checked={q.required}
-        onChange={(e) => {
-          const updated = [...questions];
-          updated[qIndex].required = e.target.checked;
-          setQuestions(updated);
-        }}
-      />
-    }
-    label="Required"
-  />
-</Grid>
-
-
-            {['mcq', 'checkbox', 'dropdown'].includes(q.type) &&
-              q.options.map((opt, oIndex) => (
-                <Grid item xs={12} key={oIndex}>
-                  <Box display="flex" alignItems="center">
-                    <TextField
-                      fullWidth
-                      label={`Option ${oIndex + 1}`}
-                      value={opt}
-                      onChange={(e) =>
-                        handleOptionChange(qIndex, oIndex, e.target.value)
-                      }
+    <Box maxWidth="md" mx="auto" p={{ xs: 1, sm: 3, md: 5 }}>
+      <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 4, mb: 4, boxShadow: '0 2px 16px 0 rgba(60,72,100,0.09)' }}>
+        <Typography variant="h4" fontWeight={700} mb={2} color="primary.main">
+          Form Builder
+        </Typography>
+        <TextField
+          fullWidth
+          label="Form Title"
+          variant="outlined"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          sx={{ mb: 4, bgcolor: '#f4f6fb', borderRadius: 2 }}
+        />
+        {questions.map((q, qIndex) => (
+          <Paper key={qIndex} elevation={1} sx={{ p: { xs: 2, sm: 3 }, mb: 3, borderRadius: 3, bgcolor: '#f8fafc', boxShadow: '0 1px 6px 0 rgba(60,72,100,0.06)' }}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={8}>
+                <TextField
+                  fullWidth
+                  label={`Question ${qIndex + 1}`}
+                  value={q.label}
+                  onChange={(e) => handleQuestionChange(qIndex, 'label', e.target.value)}
+                  sx={{ bgcolor: '#fff', borderRadius: 2 }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  select
+                  fullWidth
+                  label="Type"
+                  value={q.type}
+                  onChange={(e) => handleQuestionChange(qIndex, 'type', e.target.value)}
+                  sx={{ bgcolor: '#fff', borderRadius: 2 }}
+                >
+                  <MenuItem value="text">Short Answer</MenuItem>
+                  <MenuItem value="mcq">Multiple Choice</MenuItem>
+                  <MenuItem value="checkbox">Checkboxes</MenuItem>
+                  <MenuItem value="dropdown">Dropdown</MenuItem>
+                </TextField>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={q.required}
+                      onChange={(e) => {
+                        const updated = [...questions];
+                        updated[qIndex].required = e.target.checked;
+                        setQuestions(updated);
+                      }}
                     />
-                    <IconButton
-                      onClick={() => handleRemoveOption(qIndex, oIndex)}
-                      color="error"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
+                  }
+                  label="Required"
+                  sx={{ ml: 1 }}
+                />
+              </Grid>
+              {['mcq', 'checkbox', 'dropdown'].includes(q.type) &&
+                q.options.map((opt, oIndex) => (
+                  <Grid item xs={12} key={oIndex}>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <TextField
+                        fullWidth
+                        label={`Option ${oIndex + 1}`}
+                        value={opt}
+                        onChange={(e) => handleOptionChange(qIndex, oIndex, e.target.value)}
+                        sx={{ bgcolor: '#fff', borderRadius: 2 }}
+                      />
+                      <IconButton
+                        onClick={() => handleRemoveOption(qIndex, oIndex)}
+                        color="error"
+                        size="small"
+                        sx={{ ml: 1 }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                  </Grid>
+                ))}
+              {['mcq', 'checkbox', 'dropdown'].includes(q.type) && (
+                <Grid item xs={12}>
+                  <Button
+                    onClick={() => handleAddOption(qIndex)}
+                    startIcon={<AddCircleOutlineIcon />}
+                    variant="outlined"
+                    color="secondary"
+                    sx={{ fontWeight: 600, borderRadius: 2 }}
+                  >
+                    Add Option
+                  </Button>
                 </Grid>
-              ))}
-
-            {['mcq', 'checkbox', 'dropdown'].includes(q.type) && (
+              )}
               <Grid item xs={12}>
                 <Button
-                  onClick={() => handleAddOption(qIndex)}
-                  startIcon={<AddCircleOutlineIcon />}
+                  variant="outlined"
+                  color="error"
+                  onClick={() => handleRemoveQuestion(qIndex)}
+                  startIcon={<DeleteIcon />}
+                  sx={{ borderRadius: 2 }}
                 >
-                  Add Option
+                  Remove Question
                 </Button>
               </Grid>
-            )}
-
-            <Grid item xs={12}>
-              <Button
-                variant="outlined"
-                color="error"
-                onClick={() => handleRemoveQuestion(qIndex)}
-                startIcon={<DeleteIcon />}
-              >
-                Remove Question
-              </Button>
             </Grid>
-          </Grid>
-        </Paper>
-      ))}
-
-      <Box display="flex" gap={2}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleAddQuestion}
-        >
-          Add Question
-        </Button>
-
-        <Button
-          variant="contained"
-          color="success"
-          onClick={handlePublishToGoogleForm}
-        >
-          Publish to Google Forms
-        </Button>
-
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={() => setShowPreview(!showPreview)}
-        >
-          {showPreview ? 'Hide Preview' : 'Preview Form'}
-        </Button>
-      </Box>
+          </Paper>
+        ))}
+        <Box display="flex" gap={2} mt={3}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddQuestion}
+            sx={{ fontWeight: 600, borderRadius: 2 }}
+          >
+            Add Question
+          </Button>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={handlePublishToGoogleForm}
+            sx={{ fontWeight: 600, borderRadius: 2 }}
+          >
+            Publish to Google Forms
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => setShowPreview(!showPreview)}
+            sx={{ fontWeight: 600, borderRadius: 2 }}
+          >
+            {showPreview ? 'Hide Preview' : 'Preview Form'}
+          </Button>
+        </Box>
+      </Paper>
       {showPreview && (
         <Box mt={5}>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" fontWeight={700} gutterBottom color="primary.main">
             🔎 Form Preview
           </Typography>
-          <Paper elevation={3} sx={{ p: 3 }}>
-            <Typography variant="h5" gutterBottom>
+          <Paper elevation={2} sx={{ p: 3, borderRadius: 3, bgcolor: '#f8fafc', boxShadow: '0 1px 6px 0 rgba(60,72,100,0.06)' }}>
+            <Typography variant="h5" fontWeight={600} gutterBottom>
               {title || 'Untitled Form'}
             </Typography>
             {questions.map((q, index) => (
               <Box key={index} mb={3}>
-                <Typography variant="subtitle1">
+                <Typography variant="subtitle1" fontWeight={600}>
                   {index + 1}. {q.label || '(No Question Text)'}
                 </Typography>
                 {q.type === 'text' && (
-                  <TextField fullWidth placeholder="Short answer" disabled />
+                  <TextField fullWidth placeholder="Short answer" disabled sx={{ mt: 1, bgcolor: '#fff', borderRadius: 2 }} />
                 )}
                 {['mcq', 'checkbox', 'dropdown'].includes(q.type) && (
                   <Box mt={1}>
                     {q.type === 'dropdown' ? (
-                      <TextField select fullWidth disabled>
+                      <TextField select fullWidth disabled sx={{ bgcolor: '#fff', borderRadius: 2 }}>
                         {q.options.map((opt, i) => (
                           <MenuItem key={i} value={opt}>{opt}</MenuItem>
                         ))}
                       </TextField>
                     ) : (
                       q.options.map((opt, i) => (
-                        <Box key={i}>
-                          <label>
-                            <input
-                              type={q.type === 'mcq' ? 'radio' : 'checkbox'}
-                              disabled
-                              name={`q${index}`}
-                            />
-                            {` ${opt}`}
-                          </label>
+                        <Box key={i} display="flex" alignItems="center" gap={1}>
+                          <input
+                            type={q.type === 'mcq' ? 'radio' : 'checkbox'}
+                            disabled
+                            name={`q${index}`}
+                            style={{ accentColor: '#3f51b5' }}
+                          />
+                          <Typography>{opt}</Typography>
                         </Box>
                       ))
                     )}
-                    
                   </Box>
                 )}
               </Box>

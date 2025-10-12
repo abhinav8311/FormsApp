@@ -23,37 +23,55 @@ const Layout = ({ children }) => {
     <Box
       sx={{
         minHeight: '100vh',
-        bgcolor: '#dda15e',
+        bgcolor: 'background.default',
         display: 'flex',
         flexDirection: 'column',
+        m: 0,
+        p: 0,
       }}
     >
-      <AppBar position="static" elevation={1} sx={{ bgcolor: '#dda15e' }}>
+      <AppBar
+        position="static"
+        elevation={0}
+        sx={{
+          bgcolor: 'primary.main',
+          boxShadow: '0 4px 24px 0 rgba(60,72,100,0.10)',
+          borderBottomLeftRadius: 18,
+          borderBottomRightRadius: 18,
+          px: { xs: 1, sm: 3, md: 6 },
+        }}
+      >
         <Toolbar
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
-            height: 64,
+            height: 72,
+            minHeight: 72,
+            px: 0,
           }}
         >
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: 'bold', color: '#fff', cursor: hideUserInfo ? 'default' : 'pointer', userSelect: 'none' }}
-            onClick={() => {
-              if (!hideUserInfo) navigate('/home');
-            }}
-          >
-            Forms Manager
-          </Typography>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <img src="/vite.svg" alt="logo" style={{ height: 36, marginRight: 8 }} />
+            <Typography
+              variant="h5"
+              sx={{ fontWeight: 700, color: '#fff', cursor: hideUserInfo ? 'default' : 'pointer', userSelect: 'none', letterSpacing: '-1px' }}
+              onClick={() => {
+                if (!hideUserInfo) navigate('/home');
+              }}
+            >
+              Forms Manager
+            </Typography>
+          </Stack>
 
           {!hideUserInfo && currentUser && (
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Typography variant="body2" sx={{ color: '#fff' }}>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Typography variant="body1" sx={{ color: '#fff', fontWeight: 500 }}>
                 {currentUser.name}
               </Typography>
               <Avatar
                 src={currentUser.picture}
                 alt={currentUser.name}
+                sx={{ width: 40, height: 40, border: '2px solid #fff', boxShadow: '0 2px 8px 0 rgba(60,72,100,0.10)' }}
               />
             </Stack>
           )}
@@ -65,21 +83,23 @@ const Layout = ({ children }) => {
         sx={{
           flex: 1,
           width: '100%',
-          p: 4,
+          p: { xs: 1, sm: 2, md: 3 },
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'flex-start',
+          m: 0,
         }}
       >
         <Paper
-          elevation={3}
+          elevation={0}
           sx={{
-            bgcolor: '#fefae0',
-            width: '90vw',         // ✅ 90% of viewport width
-            maxWidth: '1400px',    // ✅ safe upper limit on large screens
+            bgcolor: 'transparent',
+            width: '100%',
+            maxWidth: '1200px',
             minHeight: '80vh',
-            p: 4,
-            borderRadius: 2,
+            p: { xs: 0, sm: 2, md: 3 },
+            boxShadow: 'none',
+            borderRadius: 0,
           }}
         >
           {children}

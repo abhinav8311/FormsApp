@@ -134,13 +134,24 @@ const Home = () => {
 
   return (
     <Box>
-      <Typography variant="h5" gutterBottom>
+      <Typography variant="h4" fontWeight={700} mb={2}>
         Dashboard
       </Typography>
 
       {/* Search and Sort Controls */}
-      <Box display="flex" alignItems="center" gap={2} mb={3}>
-        {/* Search Field with Debouncing */}
+      <Box
+        display="flex"
+        alignItems="center"
+        gap={2}
+        mb={4}
+        flexWrap="wrap"
+        sx={{
+          background: '#fff',
+          borderRadius: 3,
+          boxShadow: '0 2px 12px 0 rgba(60,72,100,0.07)',
+          p: { xs: 2, sm: 3 },
+        }}
+      >
         <TextField
           label="Search forms"
           variant="outlined"
@@ -150,18 +161,19 @@ const Home = () => {
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton disabled>
-                  {/* You can add a search icon here if you want */}
+                  {/* Add a search icon here if you want */}
                 </IconButton>
               </InputAdornment>
             ),
           }}
-          sx={{ width: 300 }}
+          sx={{ width: 300, background: '#f4f6fb', borderRadius: 2 }}
         />
-        {/* Sort Button */}
         <Button
-          variant="outlined"
+          variant="contained"
+          color="secondary"
           startIcon={<SortIcon />}
           onClick={handleSortClick}
+          sx={{ fontWeight: 600 }}
         >
           Sort
         </Button>
@@ -179,79 +191,96 @@ const Home = () => {
       </Box>
 
       {/* Section for creating a blank form */}
-      <Typography variant="h6" sx={{ mt: 4 }}>
-        Start a New Form
-      </Typography>
-      <Grid container spacing={2} mt={1} justifyContent="center">
-        <Grid item xs={12} sm={6} md={4}>
-          <Paper
-            onClick={handleCreateNewForm}
-            sx={{
-              height: 100,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              bgcolor: '#fefae0',
-              border: '2px dashed #dda15e',
-            }}
-          >
-            <Typography fontWeight="bold">+ Blank Form</Typography>
-          </Paper>
+      <Box mt={5} mb={2}>
+        <Typography variant="h6" fontWeight={600} mb={2}>
+          Start a New Form
+        </Typography>
+        <Grid container spacing={2} justifyContent="center">
+          <Grid item xs={12} sm={6} md={4}>
+            <Paper
+              onClick={handleCreateNewForm}
+              sx={{
+                height: 120,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                bgcolor: '#e3f2fd',
+                border: '2px dashed #3f51b5',
+                borderRadius: 3,
+                boxShadow: '0 2px 12px 0 rgba(60,72,100,0.07)',
+                transition: 'background 0.2s',
+                '&:hover': { bgcolor: '#bbdefb' },
+              }}
+            >
+              <Typography fontWeight="bold" color="primary.main" fontSize={20}>
+                + Blank Form
+              </Typography>
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
+      </Box>
 
       {/* Section to list already created forms */}
-      <Typography variant="h6" sx={{ mt: 6 }}>
-        Your Forms
-      </Typography>
-      <Grid container spacing={2} mt={1}>
-        {filteredForms.length === 0 ? (
-          <Typography>No forms found.</Typography>
-        ) : (
-          filteredForms.map((form) => (
-            <Grid item key={form.docId} xs={12} sm={6} md={4}>
-              <Card sx={{ p: 2 }}>
-                <CardContent>
-                  <Box display="flex" alignItems="center" justifyContent="space-between">
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      {form.title}
-                    </Typography>
-                    {/* Delete Button */}
-                    <IconButton color="error" onClick={() => handleDeleteForm(form.docId)} size="small">
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                  {/* View Form button */}
-                  <Box mt={1}>
-                    <a
-                      href={`https://docs.google.com/forms/d/${form.id}/viewform`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View Form
-                    </a>
-                  </Box>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    sx={{ mt: 1 }}
-                    onClick={() => navigate(`/responses/${form.id}`)}
-                  >
-                    View Responses
-                  </Button>
-                  <Typography variant="caption" display="block" mt={1}>
-                    Created: {form.createdAt ? new Date(form.createdAt).toLocaleString() : 'Unknown'}
-                  </Typography>
-                  <Typography variant="caption" display="block">
-                    Responses: {responses[form.id]?.length || 0}
-                  </Typography>
-                </CardContent>
-              </Card>
+      <Box mt={6}>
+        <Typography variant="h6" fontWeight={600} mb={2}>
+          Your Forms
+        </Typography>
+        <Grid container spacing={3}>
+          {filteredForms.length === 0 ? (
+            <Grid item xs={12}>
+              <Paper sx={{ p: 4, textAlign: 'center', color: 'text.secondary', borderRadius: 3, boxShadow: '0 2px 12px 0 rgba(60,72,100,0.07)' }}>
+                <Typography variant="body1">No forms found. Create your first form above!</Typography>
+              </Paper>
             </Grid>
-          ))
-        )}
-      </Grid>
+          ) : (
+            filteredForms.map((form) => (
+              <Grid item key={form.docId} xs={12} sm={6} md={4}>
+                <Card sx={{ borderRadius: 3, boxShadow: '0 2px 16px 0 rgba(60,72,100,0.09)', p: 2, bgcolor: '#fff', minHeight: 210 }}>
+                  <CardContent>
+                    <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
+                      <Typography variant="subtitle1" fontWeight={700} fontSize={18} color="primary.main" noWrap>
+                        {form.title}
+                      </Typography>
+                      <IconButton color="error" onClick={() => handleDeleteForm(form.docId)} size="small">
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                    <Box mt={1} mb={2}>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="primary"
+                        sx={{ mr: 1, fontWeight: 600, borderRadius: 2 }}
+                        onClick={() => navigate(`/responses/${form.id}`)}
+                      >
+                        View Responses
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color="secondary"
+                        sx={{ fontWeight: 600, borderRadius: 2 }}
+                        href={`https://docs.google.com/forms/d/${form.id}/viewform`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View Form
+                      </Button>
+                    </Box>
+                    <Typography variant="caption" display="block" color="text.secondary">
+                      Created: {form.createdAt ? new Date(form.createdAt).toLocaleString() : 'Unknown'}
+                    </Typography>
+                    <Typography variant="caption" display="block" color="text.secondary">
+                      Responses: {responses[form.id]?.length || 0}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))
+          )}
+        </Grid>
+      </Box>
     </Box>
   );
 };
